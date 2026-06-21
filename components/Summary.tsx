@@ -3,11 +3,14 @@
 import { useEffect, useRef, useState } from "react";
 import { formatMoney } from "@/lib/currency";
 import { currentMonthKey, monthKey, monthLabel } from "@/lib/dates";
-import { expensesOf, loansOf, sumByCurrency } from "@/lib/selectors";
+import { expensesOf, sumByCurrency } from "@/lib/selectors";
 import type { Txn } from "@/lib/types";
+import Icon from "./Icon";
 
 interface Props {
   txns: Txn[];
+  owed: Record<string, number>;
+  owing: Record<string, number>;
   range: "month" | "all";
   onToggleRange: () => void;
 }
@@ -50,14 +53,12 @@ function CountUp({ value, currency }: { value: number; currency: string }) {
   return <>{formatMoney(display, currency)}</>;
 }
 
-export default function Summary({ txns, range, onToggleRange }: Props) {
+export default function Summary({ txns, owed, owing, range, onToggleRange }: Props) {
   const isMonth = range === "month";
 
   let exp = expensesOf(txns);
   if (isMonth) exp = exp.filter((t) => monthKey(t.date) === currentMonthKey());
   const totals = sumByCurrency(exp);
-
-  const owed = sumByCurrency(loansOf(txns).filter((t) => !t.settled));
 
   // 2-state segmented control: clicking the inactive option flips the range.
   const setMonth = () => {
@@ -94,12 +95,30 @@ export default function Summary({ txns, range, onToggleRange }: Props) {
         )}
       </div>
 
-      {Object.keys(owed).length > 0 && (
-        <div className="summary-owed">
-          💰 Owed to you:{" "}
-          {Object.entries(owed)
-            .map(([c, a]) => formatMoney(a, c))
-            .join(" · ")}
+      {(Object.keys(owed).length > 0 || Object.keys(owing).length > 0) && (
+        <div className="summary-chips">
+          {Object.keys(owed).length > 0 && (
+            <div className="summary-owed">
+              <Icon name="owed" size={15} strokeWidth={2.4} />
+              Owed to you{" "}
+              <b>
+                {Object.entries(owed)
+                  .map(([c, a]) => formatMoney(a, c))
+                  .join(" · ")}
+              </b>
+            </div>
+          )}
+          {Object.keys(owing).length > 0 && (
+            <div className="summary-owed owe">
+              <Icon name="owe" size={15} strokeWidth={2.4} />
+              You owe{" "}
+              <b>
+                {Object.entries(owing)
+                  .map(([c, a]) => formatMoney(a, c))
+                  .join(" · ")}
+              </b>
+            </div>
+          )}
         </div>
       )}
     </section>

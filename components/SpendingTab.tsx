@@ -2,7 +2,8 @@
 
 import { useState } from "react";
 import { formatMoney } from "@/lib/currency";
-import { categoryColor, categoryEmoji } from "@/lib/categories";
+import { categoryColor, categoryIcon } from "@/lib/categories";
+import Icon from "./Icon";
 import { currentMonthKey, monthKey, monthLabel } from "@/lib/dates";
 import { expensesOf, knownMonths, sortByDateDesc, sumByCurrency } from "@/lib/selectors";
 import type { Txn } from "@/lib/types";
@@ -85,8 +86,14 @@ export default function SpendingTab({ txns, loaded, onDelete, onEdit }: Props) {
                 {rows.map(([cat, amt]) => (
                   <div className="cat-row" key={cat}>
                     <div className="cat-row-head">
-                      <span>
-                        {categoryEmoji(cat)} {cat}
+                      <span className="cat-label">
+                        <span
+                          className="cat-dot"
+                          style={{ background: `${categoryColor(cat)}1f`, color: categoryColor(cat) }}
+                        >
+                          <Icon name={categoryIcon(cat)} size={15} />
+                        </span>
+                        {cat}
                       </span>
                       <span>{formatMoney(amt, cur)}</span>
                     </div>
@@ -117,7 +124,7 @@ export default function SpendingTab({ txns, loaded, onDelete, onEdit }: Props) {
             ))}
           </ul>
         ) : (
-          <EmptyState emoji="🧾" title="No expenses here" sub="Try a different month, or add one from the Add tab." />
+          <EmptyState icon="receipt" title="No expenses here" sub="Try a different month, or add one from the Add tab." />
         )}
       </div>
     </>

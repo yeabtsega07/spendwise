@@ -1,11 +1,12 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import Icon, { type IconName } from "./Icon";
 
 type Theme = "system" | "light" | "dark";
 
 const NEXT: Record<Theme, Theme> = { system: "light", light: "dark", dark: "system" };
-const ICON: Record<Theme, string> = { system: "🌗", light: "☀️", dark: "🌙" };
+const ICON: Record<Theme, IconName> = { system: "sun", light: "sun", dark: "moon" };
 const LABEL: Record<Theme, string> = { system: "Auto", light: "Light", dark: "Dark" };
 
 export default function ThemeToggle() {
@@ -38,7 +39,7 @@ export default function ThemeToggle() {
       title={`Theme: ${LABEL[theme]}`}
       aria-label={`Theme: ${LABEL[theme]} (tap to change)`}
     >
-      {ICON[theme]}
+      <Icon name={ICON[theme]} size={17} />
     </button>
   );
 }

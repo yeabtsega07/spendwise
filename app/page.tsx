@@ -33,7 +33,12 @@ export default function Home() {
 
   return (
     <ToastProvider>
-      <TrackerApp supabase={getSupabaseBrowser()} email={session.user.email ?? ""} />
+      <TrackerApp
+        supabase={getSupabaseBrowser()}
+        email={session.user.email ?? ""}
+        userId={session.user.id}
+        userMeta={session.user.user_metadata ?? null}
+      />
     </ToastProvider>
   );
 }

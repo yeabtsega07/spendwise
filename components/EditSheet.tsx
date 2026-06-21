@@ -106,7 +106,7 @@ export default function EditSheet({ txn, onSave, onDelete, onClose }: Props) {
                 <select value={category} onChange={(e) => setCategory(e.target.value)}>
                   {CATEGORIES.map((c) => (
                     <option key={c.key} value={c.key}>
-                      {c.emoji} {c.key}
+                      {c.key}
                     </option>
                   ))}
                 </select>

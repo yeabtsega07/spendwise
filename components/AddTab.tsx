@@ -4,10 +4,11 @@ import { useState } from "react";
 import type { FormEvent, ReactNode } from "react";
 import { parseEntry } from "@/lib/parse";
 import { CURRENCIES, formatMoney } from "@/lib/currency";
-import { CATEGORIES, categoryEmoji } from "@/lib/categories";
+import { CATEGORIES } from "@/lib/categories";
 import { todayStr } from "@/lib/dates";
 import { sortByDateDesc } from "@/lib/selectors";
 import type { NewTxn } from "@/hooks/useTransactions";
+import type { NewLoan } from "@/hooks/useLoans";
 import type { Txn } from "@/lib/types";
 import TxnItem from "./TxnItem";
 import EmptyState from "./EmptyState";
@@ -18,6 +19,7 @@ interface Props {
   txns: Txn[];
   loaded: boolean;
   add: (t: NewTxn) => void;
+  addLoan: (n: NewLoan) => void;
   onDelete: (id: string) => void;
   onEdit: (t: Txn) => void;
   onToggleSettle: (id: string) => void;
@@ -31,7 +33,7 @@ const emptyDetail = () => ({
   date: todayStr(),
 });
 
-export default function AddTab({ txns, loaded, add, onDelete, onEdit, onToggleSettle }: Props) {
+export default function AddTab({ txns, loaded, add, addLoan, onDelete, onEdit, onToggleSettle }: Props) {
   const [quick, setQuick] = useState("");
   const [detail, setDetail] = useState(emptyDetail);
   const toast = useToast();
@@ -41,9 +43,20 @@ export default function AddTab({ txns, loaded, add, onDelete, onEdit, onToggleSe
   function submitQuick(e: FormEvent) {
     e.preventDefault();
     if (!parsed) return;
+    if (parsed.kind === "loan") {
+      addLoan({
+        borrowerName: parsed.person || "Someone",
+        amount: parsed.amount,
+        currency: parsed.currency,
+        note: parsed.note,
+      });
+      setQuick("");
+      toast.show("Loan recorded — open Lending to link them by email 🤝");
+      return;
+    }
     add(parsed);
     setQuick("");
-    toast.show(parsed.kind === "loan" ? "Loan recorded 🤝" : "Added 🎉");
+    toast.show("Added 🎉");
   }
 
   function submitDetail(e: FormEvent) {
@@ -69,7 +82,7 @@ export default function AddTab({ txns, loaded, add, onDelete, onEdit, onToggleSe
     preview =
       parsed.kind === "loan"
         ? `🤝 Lend ${formatMoney(parsed.amount, parsed.currency)} to ${parsed.person || "?"}`
-        : `${categoryEmoji(parsed.category)} ${formatMoney(parsed.amount, parsed.currency)} · ${parsed.note} · ${parsed.category}`;
+        : `${formatMoney(parsed.amount, parsed.currency)} · ${parsed.note} · ${parsed.category}`;
   } else if (quick.trim()) {
     preview = "Keep typing… e.g. 10 birr gum";
   }
@@ -149,7 +162,7 @@ export default function AddTab({ txns, loaded, add, onDelete, onEdit, onToggleSe
               >
                 {CATEGORIES.map((c) => (
                   <option key={c.key} value={c.key}>
-                    {c.emoji} {c.key}
+                    {c.key}
                   </option>
                 ))}
               </select>
@@ -187,7 +200,7 @@ export default function AddTab({ txns, loaded, add, onDelete, onEdit, onToggleSe
             ))}
           </ul>
         ) : (
-          <EmptyState emoji="🌱" title="Nothing yet" sub="Add your first expense above to get started." />
+          <EmptyState icon="wallet" title="Nothing yet" sub="Add your first expense above to get started." />
         )}
       </div>
     </>

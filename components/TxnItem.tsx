@@ -3,9 +3,10 @@
 import { useRef, useState } from "react";
 import type { PointerEvent as ReactPointerEvent } from "react";
 import { formatMoney } from "@/lib/currency";
-import { categoryColor, categoryEmoji, LOAN_COLOR, LOAN_EMOJI } from "@/lib/categories";
+import { categoryColor, categoryIcon, LOAN_COLOR } from "@/lib/categories";
 import { shortDate } from "@/lib/dates";
 import type { Txn } from "@/lib/types";
+import Icon from "./Icon";
 
 interface Props {
   txn: Txn;
@@ -53,7 +54,7 @@ export default function TxnItem({ txn, onDelete, onEdit, showSettle, onToggleSet
     onEdit?.(txn);
   }
 
-  const emoji = txn.kind === "loan" ? LOAN_EMOJI : categoryEmoji(txn.category);
+  const iconName = txn.kind === "loan" ? "coins" : categoryIcon(txn.category);
   const color = txn.kind === "loan" ? LOAN_COLOR : categoryColor(txn.category);
   const title = txn.kind === "loan" ? `Lent to ${txn.person || "someone"}` : txn.note;
 
@@ -67,7 +68,8 @@ export default function TxnItem({ txn, onDelete, onEdit, showSettle, onToggleSet
     <li className="txn-row">
       {dx < 0 && (
         <div className="txn-row-bg">
-          <span>🗑️ Delete</span>
+          <Icon name="trash" size={17} />
+          <span>Delete</span>
         </div>
       )}
       <div
@@ -81,9 +83,9 @@ export default function TxnItem({ txn, onDelete, onEdit, showSettle, onToggleSet
       >
         <span
           className="txn-emoji"
-          style={{ background: `${color}22`, boxShadow: `inset 0 0 0 1px ${color}33` }}
+          style={{ background: `${color}1f`, color, boxShadow: `inset 0 0 0 1px ${color}33` }}
         >
-          {emoji}
+          <Icon name={iconName} size={21} />
         </span>
         <div className="txn-body">
           <div className="txn-note">{title}</div>

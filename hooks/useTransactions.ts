@@ -65,6 +65,7 @@ export function useTransactions(supabase: SupabaseClient) {
       const { data, error } = await supabase
         .from("transactions")
         .select("*")
+        .eq("kind", "expense")
         .order("date", { ascending: false })
         .order("created_at", { ascending: false });
       if (!active) return;

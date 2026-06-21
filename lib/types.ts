@@ -21,3 +21,54 @@ export interface ParsedEntry {
   person: string;
   category: string;
 }
+
+/** A user in the directory — found by typing their email. */
+export interface Profile {
+  id: string;
+  email: string;
+  displayName: string;
+}
+
+/**
+ * A loan between two people. The same row is visible to both the lender and
+ * the borrower (when the borrower is a real user), so it shows on both screens.
+ * `direction` and `counterpart` are derived for whoever is currently viewing.
+ */
+export interface Loan {
+  id: string;
+  at: number;
+  lenderId: string;
+  lenderName: string;
+  borrowerId?: string;
+  borrowerName: string;
+  amount: number;
+  currency: string;
+  note: string;
+  date: string;
+  status: "active" | "settled";
+  // Derived for the current viewer:
+  direction: "out" | "in"; // "out" = you lent it; "in" = you owe it
+  counterpart: string; // the other person's name
+  linked: boolean; // true when the other person is a real SpendWise user
+}
+
+export interface BillShare {
+  id: string;
+  userId?: string;
+  name: string;
+  amount: number;
+  paid: boolean;
+  isCreator: boolean;
+}
+
+/** A split bill: the creator paid `total`, split into `shares`. */
+export interface Bill {
+  id: string;
+  at: number;
+  creatorId: string;
+  title: string;
+  currency: string;
+  total: number;
+  date: string;
+  shares: BillShare[];
+}

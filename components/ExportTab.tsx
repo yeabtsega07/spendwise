@@ -2,6 +2,7 @@
 
 import { buildClaudePrompt, exportFilename, toCSV } from "@/lib/export";
 import type { Txn } from "@/lib/types";
+import Icon from "./Icon";
 import { useToast } from "./Toast";
 
 function download(content: string, filename: string, type: string) {
@@ -37,8 +38,9 @@ export default function ExportTab({ txns }: { txns: Txn[] }) {
           Copy your data with a ready-made prompt, then paste it into{" "}
           <em>claude.ai</em>. Uses your Claude subscription, so there&apos;s no API cost.
         </p>
-        <button className="btn primary full" onClick={copyForClaude} disabled={empty}>
-          📋 Copy my data for Claude
+        <button className="btn primary full btn-icon" onClick={copyForClaude} disabled={empty}>
+          <Icon name="copy" size={18} />
+          Copy my data for Claude
         </button>
         <ol className="setup-steps" style={{ marginTop: 14 }}>
           <li>Tap the button above.</li>

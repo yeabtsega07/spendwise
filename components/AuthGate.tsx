@@ -3,6 +3,7 @@
 import { useState } from "react";
 import type { FormEvent } from "react";
 import type { SupabaseClient } from "@supabase/supabase-js";
+import Icon from "./Icon";
 
 export default function AuthGate({ supabase }: { supabase: SupabaseClient }) {
   const [mode, setMode] = useState<"signin" | "signup">("signup");
@@ -48,7 +49,9 @@ export default function AuthGate({ supabase }: { supabase: SupabaseClient }) {
   return (
     <div className="auth-wrap">
       <div className="auth-card">
-        <div className="auth-logo">💸</div>
+        <div className="auth-logo">
+          <Icon name="wallet" size={32} />
+        </div>
         <h1>Spendwise</h1>
         <p className="auth-sub">
           {mode === "signin"
