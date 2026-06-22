@@ -13,7 +13,10 @@ import type { Txn } from "@/lib/types";
 import TxnItem from "./TxnItem";
 import EmptyState from "./EmptyState";
 import SkeletonList from "./Skeleton";
+import Icon from "./Icon";
 import { useToast } from "./Toast";
+
+const PAGE_SIZE = 6;
 
 interface Props {
   txns: Txn[];
@@ -36,6 +39,7 @@ const emptyDetail = () => ({
 export default function AddTab({ txns, loaded, add, addLoan, onDelete, onEdit, onToggleSettle }: Props) {
   const [quick, setQuick] = useState("");
   const [detail, setDetail] = useState(emptyDetail);
+  const [page, setPage] = useState(1);
   const toast = useToast();
 
   const parsed = parseEntry(quick);
@@ -56,6 +60,7 @@ export default function AddTab({ txns, loaded, add, addLoan, onDelete, onEdit, o
     }
     add(parsed);
     setQuick("");
+    setPage(1);
     toast.show("Added 🎉");
   }
 
@@ -72,6 +77,7 @@ export default function AddTab({ txns, loaded, add, addLoan, onDelete, onEdit, o
       date: detail.date || todayStr(),
     });
     setDetail(emptyDetail());
+    setPage(1);
     toast.show("Added 🎉");
   }
 
@@ -87,7 +93,12 @@ export default function AddTab({ txns, loaded, add, addLoan, onDelete, onEdit, o
     preview = "Keep typing… e.g. 10 birr gum";
   }
 
-  const recent = sortByDateDesc(txns).slice(0, 8);
+  const sorted = sortByDateDesc(txns);
+  const pageCount = Math.max(1, Math.ceil(sorted.length / PAGE_SIZE));
+  const safePage = Math.min(page, pageCount);
+  const start = (safePage - 1) * PAGE_SIZE;
+  const recent = sorted.slice(start, start + PAGE_SIZE);
+  const showPager = sorted.length > PAGE_SIZE;
 
   return (
     <>
@@ -183,22 +194,53 @@ export default function AddTab({ txns, loaded, add, addLoan, onDelete, onEdit, o
       </div>
 
       <div className="card">
-        <h2>Recent</h2>
+        <div className="row-between" style={{ marginBottom: 12 }}>
+          <h2 style={{ margin: 0 }}>Recent</h2>
+          {loaded && sorted.length > 0 && (
+            <span className="count-badge">{sorted.length}</span>
+          )}
+        </div>
         {!loaded ? (
           <SkeletonList rows={4} />
         ) : recent.length ? (
-          <ul className="txn-list">
-            {recent.map((t) => (
-              <TxnItem
-                key={t.id}
-                txn={t}
-                onDelete={onDelete}
-                onEdit={onEdit}
-                showSettle={t.kind === "loan"}
-                onToggleSettle={onToggleSettle}
-              />
-            ))}
-          </ul>
+          <>
+            <ul className="txn-list">
+              {recent.map((t) => (
+                <TxnItem
+                  key={t.id}
+                  txn={t}
+                  onDelete={onDelete}
+                  onEdit={onEdit}
+                  showSettle={t.kind === "loan"}
+                  onToggleSettle={onToggleSettle}
+                />
+              ))}
+            </ul>
+            {showPager && (
+              <div className="pager">
+                <button
+                  className="pager-btn"
+                  onClick={() => setPage(safePage - 1)}
+                  disabled={safePage <= 1}
+                  aria-label="Previous page"
+                >
+                  <Icon name="chevronLeft" size={18} />
+                </button>
+                <span className="pager-info">
+                  {start + 1}–{Math.min(start + PAGE_SIZE, sorted.length)}
+                  <span className="pager-of"> of {sorted.length}</span>
+                </span>
+                <button
+                  className="pager-btn"
+                  onClick={() => setPage(safePage + 1)}
+                  disabled={safePage >= pageCount}
+                  aria-label="Next page"
+                >
+                  <Icon name="chevronRight" size={18} />
+                </button>
+              </div>
+            )}
+          </>
         ) : (
           <EmptyState icon="wallet" title="Nothing yet" sub="Add your first expense above to get started." />
         )}

@@ -653,6 +653,63 @@ details[open] .details-summary::before {
   max-width: 260px;
 }
 
+/* Count badge (e.g. number of recent entries) */
+.count-badge {
+  font-size: 0.74rem;
+  font-weight: 700;
+  font-variant-numeric: tabular-nums;
+  color: var(--muted);
+  background: var(--surface-2);
+  border: 1px solid var(--border);
+  padding: 2px 10px;
+  border-radius: var(--pill);
+}
+
+/* Pagination */
+.pager {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-top: 12px;
+  padding-top: 12px;
+  border-top: 1px solid var(--border);
+}
+.pager-btn {
+  display: grid;
+  place-items: center;
+  width: 38px;
+  height: 38px;
+  border: 1.5px solid var(--border);
+  border-radius: 11px;
+  background: var(--surface-2);
+  color: var(--text);
+  cursor: pointer;
+  transition: background 0.15s, border-color 0.15s, transform 0.1s;
+}
+.pager-btn:hover:not(:disabled) {
+  background: var(--surface);
+  border-color: var(--brand);
+  color: var(--brand-ink);
+}
+.pager-btn:active:not(:disabled) {
+  transform: scale(0.92);
+}
+.pager-btn:disabled {
+  opacity: 0.4;
+  cursor: default;
+}
+.pager-info {
+  font-size: 0.84rem;
+  font-weight: 700;
+  font-variant-numeric: tabular-nums;
+  color: var(--text);
+  letter-spacing: 0.01em;
+}
+.pager-of {
+  color: var(--muted);
+  font-weight: 600;
+}
+
 /* Skeleton loading */
 .skeleton-list {
   display: flex;

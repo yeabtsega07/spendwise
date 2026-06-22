@@ -29,6 +29,8 @@ export type IconName =
   | "moon"
   | "logout"
   | "copy"
+  | "chevronLeft"
+  | "chevronRight"
   | "search";
 
 const P: Record<IconName, ReactElement> = {
@@ -179,6 +181,8 @@ const P: Record<IconName, ReactElement> = {
       <path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1" />
     </>
   ),
+  chevronLeft: <path d="m15 18-6-6 6-6" />,
+  chevronRight: <path d="m9 18 6-6-6-6" />,
 };
 
 interface Props extends Omit<SVGProps<SVGSVGElement>, "name"> {
