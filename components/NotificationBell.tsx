@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import { createPortal } from "react-dom";
 import Icon, { type IconName } from "./Icon";
 
 export type NotifTab = "lending" | "split";
@@ -58,8 +59,12 @@ export default function NotificationBell({ items, seen, onOpen, onNavigate }: Pr
         {unread > 0 && <span className="notif-badge">{unread > 9 ? "9+" : unread}</span>}
       </button>
 
-      {open && (
-        <div className="sheet-overlay" onClick={() => setOpen(false)}>
+      {open &&
+        typeof document !== "undefined" &&
+        createPortal(
+          // Rendered to <body> so the fixed overlay covers the whole viewport —
+          // inside the hero (overflow:hidden + transform) it would be clipped.
+          <div className="sheet-overlay" onClick={() => setOpen(false)}>
           <div className="sheet notif-sheet" onClick={(e) => e.stopPropagation()}>
             <div className="sheet-handle" />
             <div className="notif-head">
@@ -107,8 +112,9 @@ export default function NotificationBell({ items, seen, onOpen, onNavigate }: Pr
               </div>
             )}
           </div>
-        </div>
-      )}
+        </div>,
+          document.body
+        )}
     </>
   );
 }

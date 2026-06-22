@@ -16,6 +16,7 @@ import SplitTab from "./SplitTab";
 import ExportTab from "./ExportTab";
 import EditSheet from "./EditSheet";
 import ThemeToggle from "./ThemeToggle";
+import Icon from "./Icon";
 import NotificationBell, { type Notif, type NotifTab } from "./NotificationBell";
 import TabBar, { type TabKey } from "./TabBar";
 import { formatMoney } from "@/lib/currency";
@@ -189,8 +190,13 @@ export default function TrackerApp({ supabase, email, userId, userMeta }: Props)
                 onNavigate={openFromNotif}
               />
               <ThemeToggle />
-              <button className="link-btn" onClick={() => supabase.auth.signOut()} title={email}>
-                Sign out
+              <button
+                className="link-btn icon-btn"
+                onClick={() => supabase.auth.signOut()}
+                title={`Sign out (${email})`}
+                aria-label="Sign out"
+              >
+                <Icon name="logout" size={17} />
               </button>
             </div>
           </div>
