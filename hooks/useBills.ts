@@ -181,5 +181,5 @@ export function useBills(supabase: SupabaseClient, uid: string) {
     [supabase]
   );
 
-  return { bills: sortBills(bills), loaded, create, setPaid, remove };
+  return { bills: sortBills(bills), loaded, create, setPaid, remove, reload: load };
 }

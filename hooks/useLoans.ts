@@ -71,24 +71,21 @@ export function useLoans(supabase: SupabaseClient, uid: string, myName: string) 
   const ref = useRef<Loan[]>([]);
   ref.current = loans;
 
-  useEffect(() => {
+  const reload = useCallback(async () => {
     if (!uid) return;
-    let active = true;
-    (async () => {
-      const { data, error } = await supabase
-        .from("loans")
-        .select("*")
-        .order("date", { ascending: false })
-        .order("created_at", { ascending: false });
-      if (!active) return;
-      if (error) console.warn("Could not load loans:", error.message);
-      else if (data) setLoans((data as LoanRow[]).map((r) => rowToLoan(r, uid)));
-      setLoaded(true);
-    })();
-    return () => {
-      active = false;
-    };
+    const { data, error } = await supabase
+      .from("loans")
+      .select("*")
+      .order("date", { ascending: false })
+      .order("created_at", { ascending: false });
+    if (error) console.warn("Could not load loans:", error.message);
+    else if (data) setLoans((data as LoanRow[]).map((r) => rowToLoan(r, uid)));
+    setLoaded(true);
   }, [supabase, uid]);
+
+  useEffect(() => {
+    reload();
+  }, [reload]);
 
   const add = useCallback(
     async (n: NewLoan) => {
@@ -148,5 +145,5 @@ export function useLoans(supabase: SupabaseClient, uid: string, myName: string) 
     [supabase]
   );
 
-  return { loans, loaded, add, toggleSettled, remove };
+  return { loans, loaded, add, toggleSettled, remove, reload };
 }
