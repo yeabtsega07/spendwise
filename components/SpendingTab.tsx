@@ -11,6 +11,8 @@ import TxnItem from "./TxnItem";
 import EmptyState from "./EmptyState";
 import SkeletonList from "./Skeleton";
 
+const PAGE_SIZE = 6;
+
 interface Props {
   txns: Txn[];
   loaded: boolean;
@@ -20,6 +22,7 @@ interface Props {
 
 export default function SpendingTab({ txns, loaded, onDelete, onEdit }: Props) {
   const [selected, setSelected] = useState<string>(currentMonthKey());
+  const [page, setPage] = useState(1);
 
   // Always include the current month so the dropdown value is valid even
   // before any expense exists for it.
@@ -41,6 +44,11 @@ export default function SpendingTab({ txns, loaded, onDelete, onEdit }: Props) {
   }
 
   const sorted = sortByDateDesc(list);
+  const pageCount = Math.max(1, Math.ceil(sorted.length / PAGE_SIZE));
+  const safePage = Math.min(page, pageCount);
+  const start = (safePage - 1) * PAGE_SIZE;
+  const pageRows = sorted.slice(start, start + PAGE_SIZE);
+  const showPager = sorted.length > PAGE_SIZE;
 
   return (
     <>
@@ -50,7 +58,10 @@ export default function SpendingTab({ txns, loaded, onDelete, onEdit }: Props) {
           <select
             className="month-filter"
             value={selected}
-            onChange={(e) => setSelected(e.target.value)}
+            onChange={(e) => {
+              setSelected(e.target.value);
+              setPage(1);
+            }}
           >
             <option value="all">All time</option>
             {months.map((m) => (
@@ -114,15 +125,46 @@ export default function SpendingTab({ txns, loaded, onDelete, onEdit }: Props) {
       </div>
 
       <div className="card">
-        <h2>Expenses</h2>
+        <div className="row-between" style={{ marginBottom: 12 }}>
+          <h2 style={{ margin: 0 }}>Expenses</h2>
+          {loaded && sorted.length > 0 && (
+            <span className="count-badge">{sorted.length}</span>
+          )}
+        </div>
         {!loaded ? (
           <SkeletonList rows={5} />
-        ) : sorted.length ? (
-          <ul className="txn-list">
-            {sorted.map((t) => (
-              <TxnItem key={t.id} txn={t} onDelete={onDelete} onEdit={onEdit} />
-            ))}
-          </ul>
+        ) : pageRows.length ? (
+          <>
+            <ul className="txn-list">
+              {pageRows.map((t) => (
+                <TxnItem key={t.id} txn={t} onDelete={onDelete} onEdit={onEdit} />
+              ))}
+            </ul>
+            {showPager && (
+              <div className="pager">
+                <button
+                  className="pager-btn"
+                  onClick={() => setPage(safePage - 1)}
+                  disabled={safePage <= 1}
+                  aria-label="Previous page"
+                >
+                  <Icon name="chevronLeft" size={18} />
+                </button>
+                <span className="pager-info">
+                  {start + 1}–{Math.min(start + PAGE_SIZE, sorted.length)}
+                  <span className="pager-of"> of {sorted.length}</span>
+                </span>
+                <button
+                  className="pager-btn"
+                  onClick={() => setPage(safePage + 1)}
+                  disabled={safePage >= pageCount}
+                  aria-label="Next page"
+                >
+                  <Icon name="chevronRight" size={18} />
+                </button>
+              </div>
+            )}
+          </>
         ) : (
           <EmptyState icon="receipt" title="No expenses here" sub="Try a different month, or add one from the Add tab." />
         )}
